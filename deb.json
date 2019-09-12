@@ -1,0 +1,24 @@
+{
+  "name": "kssh",
+  "version": "0.1.0",
+  "maintainer": "Ato Araki (@atotto)",
+  "description": "google cloud kms ssh tool",
+  "changelog-cmd": "git log --pretty='format:%cd %h %s %d [%an]' --date=iso --merges",
+  "homepage": "https://github.com/atotto/kssh",
+  "files": [
+    {
+      "from": "build/kssh",
+      "to": "/usr/local/bin/",
+      "base" : "build/",
+      "fperm": "0755"
+    }
+  ],
+  "copyrights": [
+    {
+      "files": "*",
+      "copyright": "Copyright (c) 2019 Ato Araki",
+      "license": "MIT",
+      "file": ""
+    }
+  ]
+}
