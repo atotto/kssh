@@ -2,13 +2,8 @@ package main
 
 import (
 	"context"
-	"crypto"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -52,7 +47,14 @@ func main() {
 	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	signer, err := loadSigner(ctx, *key)
+	client, err := kms.NewKeyManagementClient(ctx)
+	if err != nil {
+		log.Printf("google cloud kms: %s", err)
+		os.Exit(1)
+	}
+	defer client.Close()
+
+	signer, err := cloudkms.NewSigner(client, *key)
 	if err != nil {
 		log.Printf("load key: %s", err)
 		os.Exit(1)
@@ -167,33 +169,4 @@ func run(ctx context.Context, signer ssh.Signer, user, host string, port int) er
 		return fmt.Errorf("ssh: %s", err)
 	}
 	return nil
-}
-
-func loadSigner(ctx context.Context, path string) (crypto.Signer, error) {
-	if strings.HasPrefix(path, "projects") {
-		client, err := kms.NewKeyManagementClient(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return cloudkms.NewSigner(client, path)
-	} else {
-		buf, err := ioutil.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-		privateKeyBlock, _ := pem.Decode(buf)
-		if privateKeyBlock == nil {
-			return nil, fmt.Errorf("Failed to decode")
-		}
-		privateKey, err := x509.ParsePKCS8PrivateKey(privateKeyBlock.Bytes)
-		if err != nil {
-			return nil, err
-		}
-		switch key := privateKey.(type) {
-		case *rsa.PrivateKey:
-			return key, nil
-		default:
-			return nil, fmt.Errorf("not implemented yet")
-		}
-	}
 }
