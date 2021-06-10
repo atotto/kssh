@@ -1,0 +1,19 @@
+name: kssh
+base: core20
+version: '0.1.0'
+summary: SSH client with Google Cloud KMS
+description: |
+  SSH client with Google Cloud KMS
+  https://github.com/atotto/kssh
+
+grade: stable
+
+parts:
+  kssh:
+    plugin: go
+    source: .
+    source-type: git
+
+apps:
+  kssh:
+    command: bin/kssh

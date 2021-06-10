@@ -2,3 +2,6 @@
 /build
 /pkg-build
 *.deb
+*.snap
+.idea
+/parts
