@@ -21,6 +21,7 @@ import (
 	"github.com/atotto/cloudkms"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
+	"google.golang.org/api/option"
 )
 
 // You can set key path `export KSSH_KEY_PATH=projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[KEY_RING]/cryptoKeys/[KEY]/cryptoKeyVersions/[VERSION]` EC_SIGN_P256_SHA256 Algorithm
@@ -171,7 +172,11 @@ func run(ctx context.Context, signer ssh.Signer, user, host string, port int) er
 
 func loadSigner(ctx context.Context, path string) (crypto.Signer, error) {
 	if strings.HasPrefix(path, "projects") {
-		client, err := kms.NewKeyManagementClient(ctx)
+		var opts []option.ClientOption
+		if keyPath := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"); keyPath != "" {
+			opts = []option.ClientOption{option.WithCredentialsFile(keyPath)}
+		}
+		client, err := kms.NewKeyManagementClient(ctx, opts...)
 		if err != nil {
 			return nil, err
 		}
