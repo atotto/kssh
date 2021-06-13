@@ -7,6 +7,7 @@ description: |
   https://github.com/atotto/kssh
 
 grade: stable
+confinement: classic
 
 parts:
   kssh:
